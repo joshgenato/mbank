@@ -12,9 +12,18 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MailIcon from '@mui/icons-material/Mail';
+
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import SavingsIcon from '@mui/icons-material/Savings';
+import Menu from '@mui/material/Menu';
+
+import MenuItem from '@mui/material/MenuItem';
+
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -29,7 +38,26 @@ interface Props {
 
 export default function Navbar(props: Props) {
   const { window } = props;
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+    React.useState<null | HTMLElement>(null);
+
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -70,15 +98,45 @@ export default function Navbar(props: Props) {
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
+  const mobileMenuId = 'primary-search-account-menu-mobile';
+  const renderMobileMenu = (
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={mobileMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+    >
+      <MenuItem>
+        <IconButton
+          size='large'
+          aria-label='account of current user'
+          aria-controls='primary-search-account-menu'
+          aria-haspopup='true'
+          color='inherit'
+          component={Link}
+          to='/profile'
+        >
+          <AccountCircle />
+        </IconButton>
+        <p>Profile</p>
+      </MenuItem>
+    </Menu>
+  );
+
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
+    <Box sx={{ flexGrow: 1 }}>
       <AppBar
         position='fixed'
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-        }}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
           <IconButton
@@ -90,11 +148,42 @@ export default function Navbar(props: Props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant='h6' noWrap component='div'>
-            Responsive drawer
+          <SavingsIcon />
+          <Typography
+            variant='h6'
+            noWrap
+            component='div'
+            sx={{ display: { xs: 'none', sm: 'block' } }}
+          >
+            MBank
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton
+              size='large'
+              edge='end'
+              aria-label='account of current user'
+              aria-haspopup='true'
+              color='inherit'
+            >
+              <AccountCircle />
+            </IconButton>
+          </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size='large'
+              aria-label='show more'
+              aria-controls={mobileMenuId}
+              aria-haspopup='true'
+              onClick={handleMobileMenuOpen}
+              color='inherit'
+            >
+              <MoreIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
+      {renderMobileMenu}
       <Box
         component='nav'
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
